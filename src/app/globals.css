@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&family=Lalezar&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+
+  /* زبان طراحی نئوبروتالیست پوستری */
+  --color-ink-50: #f4f3ef;
+  --color-ink-100: #e4e2da;
+  --color-ink-700: #3a3833;
+  --color-ink-800: #201e1b;
+  --color-ink-900: #141414;
+
+  --color-paper: #f2efe6;
+  --color-paper-dark: #e7e2d2;
+
+  /* نارنجی جوهری — رنگ اکشن اصلی */
+  --color-reg: #ff4d12;
+  --color-reg-dark: #e03d05;
+
+  /* آبی الکتریک — لینک و اطلاعات */
+  --color-cyanink: #2036e8;
+  --color-cyanink-dark: #1526b8;
+
+  /* لیموییِ اسیدی — هایلایت و امضای برند */
+  --color-goldc: #c6f432;
+  --color-goldc-dark: #a4d40e;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink-900);
+  background-image: radial-gradient(rgba(20, 20, 20, 0.055) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* تیترها با فونت نمایشی لاله‌زار — حس پوستر چاپی */
+h1,
+h2,
+h3 {
+  font-family: "Lalezar", "Vazirmatn", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* بروتالیسم: هیچ گوشه‌ی گردی وجود ندارد */
+[class*="rounded"] {
+  border-radius: 0 !important;
+}
+
+::selection {
+  background: #c6f432;
+  color: #141414;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #141414;
+}
+*::-webkit-scrollbar-track {
+  background: #e7e2d2;
+}
+
+/* نوار متحرک تیکر */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+.marquee-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+}
+
+/* برچسب چرخیده روی تصاویر */
+.sticker-rotate {
+  transform: rotate(-6deg);
+}
+
+/* دکمه‌های بروتالیست: جابه‌جایی به‌جای محو شدن */
+.brut-press {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.brut-press:hover {
+  transform: translate(-2px, -2px);
+}
+.brut-press:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
