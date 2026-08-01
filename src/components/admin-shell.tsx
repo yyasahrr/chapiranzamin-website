@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import ThemeToggle from "@/components/theme-toggle";
 
 const NAV = [
   {
@@ -195,7 +194,6 @@ export default function AdminShell({ children }: { children: ReactNode }) {
           <Link href="/" className="hidden text-xs font-semibold text-slate-500 hover:text-slate-900 sm:block">
             مشاهده سایت ↗
           </Link>
-          <ThemeToggle compact />
           <Link href="/admin/notifications" className="grid h-9 w-9 place-items-center rounded-md border border-slate-200 bg-white text-slate-500">
             ♢
           </Link>

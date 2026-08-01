@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import ThemeToggle from "@/components/theme-toggle";
 
 type Me = {
   id: number;
@@ -79,7 +78,6 @@ export default function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <ThemeToggle />
           {me ? (
             <Link
               href={isStaff ? "/admin" : "/dashboard"}
@@ -150,7 +148,6 @@ export default function SiteHeader() {
               ثبت سفارش
             </Link>
           </div>
-          <div className="mt-4"><ThemeToggle /></div>
         </div>
       )}
     </header>

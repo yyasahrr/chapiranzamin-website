@@ -24,15 +24,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="fa" dir="rtl" data-scroll-behavior="smooth" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{document.documentElement.dataset.theme=localStorage.getItem('chap-theme-v2')||'formal'}catch(e){document.documentElement.dataset.theme='formal'}",
-          }}
-        />
-      </head>
+    <html lang="fa" dir="rtl" data-theme="formal" data-scroll-behavior="smooth">
       <body className="antialiased">
         <a href="#main-content" className="skip-link">
           رفتن به محتوای اصلی

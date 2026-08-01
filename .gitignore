@@ -13,3 +13,5 @@ next-env.d.ts
 php-backend/.env
 npm-debug.log*
 .dev-server*.log
+.task-temp/
+.task-npm-cache/
