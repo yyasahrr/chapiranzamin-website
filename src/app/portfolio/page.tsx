@@ -3,10 +3,10 @@ import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 
 const PROJECTS = [
-  { img: "/images/portfolio-billboard.jpg", title: "بیلبورد بزرگراهی ۳×۶ متر", tag: "بیلبورد", desc: "طراحی، چاپ و اکران بیلبورد کمپین سازمانی با پیگیری مجوز" },
-  { img: "/images/portfolio-banner.jpg", title: "بنرهای مناسبتی معابر شهری", tag: "تبلیغات شهری", desc: "چاپ و نصب سری بنرهای مناسبتی برای مبلمان شهری" },
-  { img: "/images/portfolio-print.jpg", title: "چاپ صنعتی عرض بالا", tag: "چاپ بنر", desc: "خط چاپ وینیل و فلکس با کیفیت اکوسالونت برای پروژه‌های حجیم" },
-  { img: "/images/portfolio-signage.jpg", title: "نصب تابلو سردر سازمانی", tag: "تابلو و سازه", desc: "ساخت و نصب تابلو کامپوزیت و حروف برجسته با تیم نصب در ارتفاع" },
+  { img: "/images/portfolio-billboard.svg", title: "بیلبورد بزرگراهی ۳×۶ متر", tag: "بیلبورد", desc: "طراحی، چاپ و اکران بیلبورد کمپین سازمانی با پیگیری مجوز" },
+  { img: "/images/portfolio-banner.svg", title: "بنرهای مناسبتی معابر شهری", tag: "تبلیغات شهری", desc: "چاپ و نصب سری بنرهای مناسبتی برای مبلمان شهری" },
+  { img: "/images/portfolio-print.svg", title: "چاپ صنعتی عرض بالا", tag: "چاپ بنر", desc: "خط چاپ وینیل و فلکس با کیفیت اکوسالونت برای پروژه‌های حجیم" },
+  { img: "/images/portfolio-signage.svg", title: "نصب تابلو سردر سازمانی", tag: "تابلو و سازه", desc: "ساخت و نصب تابلو کامپوزیت و حروف برجسته با تیم نصب در ارتفاع" },
   { img: "/images/hero.jpg", title: "کمپین محیطی شبانه شهری", tag: "کمپین سازمانی", desc: "اجرای کمپین تبلیغات محیطی چند نقطه‌ای در سطح شهر" },
 ];
 
@@ -25,7 +25,13 @@ export default function PortfolioPage() {
           {PROJECTS.map((p) => (
             <div key={p.title} className="overflow-hidden border-2 border-ink-900 bg-white shadow-[4px_4px_0_0_#141414]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.img} alt={p.title} className="h-52 w-full object-cover" />
+              <img
+                src={p.img}
+                alt={p.title}
+                width="800"
+                height="520"
+                className="h-52 w-full object-cover"
+              />
               <div className="p-5">
                 <span className="mb-2 inline-block border border-ink-900 bg-cyanink px-3 py-1 text-[11px] font-black text-white">
                   {p.tag}

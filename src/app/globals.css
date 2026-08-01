@@ -1,6 +1,28 @@
 @import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&family=Lalezar&display=swap");
 @import "tailwindcss";
 
+.skip-link {
+  position: fixed;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
+  z-index: 9999;
+  transform: translateY(-200%);
+  border: 2px solid #141414;
+  background: #fff;
+  color: #141414;
+  padding: 0.6rem 1rem;
+  font-weight: 800;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 3px solid #0891b2;
+  outline-offset: 3px;
+}
+
 @theme {
   --font-sans: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
 
@@ -37,6 +59,314 @@ body {
   color: var(--color-ink-900);
   background-image: radial-gradient(rgba(20, 20, 20, 0.055) 1px, transparent 1px);
   background-size: 22px 22px;
+}
+
+/* پوسته پیش‌فرض الهام‌گرفته از لوگوی رسمی */
+:root[data-theme="brand"] {
+  --color-paper: #f5f7ff;
+  --color-paper-dark: #e8ecff;
+  --color-reg: #d10bb6;
+  --color-reg-dark: #a80998;
+  --color-cyanink: #1233cf;
+  --color-cyanink-dark: #0924aa;
+  --color-goldc: #ff9f0a;
+  --color-goldc-dark: #dd7900;
+  --color-ink-700: #424b70;
+  --color-ink-800: #18224f;
+  --color-ink-900: #071441;
+}
+
+:root[data-theme="brand"] body {
+  background-color: #f5f7ff;
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(0, 184, 176, 0.10), transparent 28%),
+    radial-gradient(circle at 88% 14%, rgba(209, 11, 182, 0.09), transparent 25%),
+    linear-gradient(180deg, #f8f9ff 0%, #f3f6ff 100%);
+}
+
+:root[data-theme="brand"] header {
+  background-color: rgba(255, 255, 255, 0.92);
+}
+
+:root[data-theme="brand"] .border-2 {
+  border-color: rgba(7, 20, 65, 0.78);
+  border-radius: 10px;
+}
+
+:root[data-theme="brand"] [class*="shadow-"] {
+  box-shadow: 0 10px 28px rgba(18, 51, 207, 0.13) !important;
+}
+
+:root[data-theme="brand"] .brut-press:hover {
+  transform: translateY(-2px);
+}
+
+:root[data-theme="brand"] .poster-logo-letter,
+:root[data-theme="brand"] .poster-hero {
+  display: none;
+}
+
+:root[data-theme="brand"] .brand-logo-image {
+  display: block;
+  width: 88px;
+  right: 50%;
+  top: -2px;
+  transform: translateX(50%);
+}
+
+:root[data-theme="brand"] .brand-hero {
+  display: block;
+}
+
+:root[data-theme="brand"] .brand-logo-mark {
+  background: #0d2bcc;
+  border-color: #0d2bcc;
+  border-radius: 10px !important;
+}
+
+.theme-toggle {
+  border-radius: 8px;
+}
+
+/* پوسته رسمی: رنگ‌های کنترل‌شده‌تر و تایپوگرافی سازمانی */
+:root[data-theme="formal"] {
+  --color-paper: #f7f8fb;
+  --color-paper-dark: #edf0f5;
+  --color-reg: #b98520;
+  --color-reg-dark: #946817;
+  --color-cyanink: #087f8c;
+  --color-cyanink-dark: #05636d;
+  --color-goldc: #d8b45a;
+  --color-goldc-dark: #ad8429;
+  --color-ink-700: #475569;
+  --color-ink-800: #1d2b47;
+  --color-ink-900: #0b1f4d;
+}
+
+:root[data-theme="formal"] body {
+  background-color: #f7f8fb;
+  background-image:
+    linear-gradient(180deg, rgba(11, 31, 77, 0.025), transparent 260px),
+    radial-gradient(circle at 90% 0%, rgba(8, 127, 140, 0.055), transparent 30%);
+}
+
+:root[data-theme="formal"] h1,
+:root[data-theme="formal"] h2,
+:root[data-theme="formal"] h3 {
+  font-family: "Vazirmatn", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+:root[data-theme="formal"] header {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(11, 31, 77, 0.14);
+}
+
+:root[data-theme="formal"] .border-2 {
+  border-width: 1px;
+  border-color: rgba(11, 31, 77, 0.28);
+  border-radius: 7px;
+}
+
+:root[data-theme="formal"] [class*="shadow-"] {
+  box-shadow: 0 8px 24px rgba(11, 31, 77, 0.08) !important;
+}
+
+:root[data-theme="formal"] .brut-press:hover {
+  transform: translateY(-1px);
+}
+
+:root[data-theme="formal"] .sticker-rotate {
+  transform: none;
+}
+
+:root[data-theme="formal"] .poster-logo-letter,
+:root[data-theme="formal"] .poster-hero {
+  display: none;
+}
+
+:root[data-theme="formal"] .brand-logo-image {
+  display: block;
+  width: 88px;
+  right: 50%;
+  top: -2px;
+  transform: translateX(50%);
+}
+
+:root[data-theme="formal"] .brand-hero {
+  display: block;
+  filter: saturate(0.82) contrast(1.02);
+}
+
+:root[data-theme="formal"] .brand-logo-mark {
+  background: #0d2bcc;
+  border-color: #0d2bcc;
+  border-radius: 7px !important;
+}
+
+:root[data-theme="formal"] .marquee-track {
+  animation-duration: 42s;
+}
+
+:root[data-theme="formal"] .home-ticker {
+  display: none;
+}
+
+:root[data-theme="formal"] .corporate-hero {
+  border-color: rgba(11, 31, 77, 0.12);
+  background:
+    linear-gradient(90deg, rgba(8, 127, 140, 0.045), transparent 48%),
+    #fff;
+}
+
+:root[data-theme="formal"] .hero-eyebrow {
+  border: 0;
+  border-right: 3px solid #087f8c;
+  border-radius: 0;
+  background: transparent;
+  color: #087f8c;
+  box-shadow: none !important;
+  padding: 0.25rem 0.75rem;
+}
+
+:root[data-theme="formal"] .corporate-title {
+  max-width: 620px;
+  font-size: clamp(2.35rem, 5vw, 4rem);
+  line-height: 1.35;
+}
+
+:root[data-theme="formal"] .corporate-title-accent {
+  color: #0b1f4d;
+}
+
+:root[data-theme="formal"] .corporate-hero p {
+  border-color: #087f8c;
+}
+
+:root[data-theme="formal"] .corporate-hero .bg-reg {
+  border-color: #0b1f4d;
+  background: #0b1f4d;
+}
+
+:root[data-theme="formal"] .corporate-hero .brand-hero {
+  display: none;
+}
+
+:root[data-theme="formal"] .corporate-hero .poster-hero {
+  display: block;
+  border-radius: 6px;
+}
+
+:root[data-theme="formal"] .home-stats {
+  border-color: rgba(11, 31, 77, 0.12);
+  background: #fff;
+}
+
+:root[data-theme="formal"] .home-stats .stat-card {
+  border-color: rgba(11, 31, 77, 0.12);
+  background: #fff !important;
+  color: #0b1f4d !important;
+}
+
+:root[data-theme="formal"] .home-stats .stat-card > div:first-child {
+  color: #087f8c;
+  font-size: 2rem;
+}
+
+:root[data-theme="formal"] .service-card {
+  overflow: hidden;
+  border-color: rgba(11, 31, 77, 0.14);
+  box-shadow: 0 4px 18px rgba(11, 31, 77, 0.055) !important;
+}
+
+:root[data-theme="formal"] .service-card:hover {
+  border-color: rgba(8, 127, 140, 0.5);
+}
+
+:root[data-theme="formal"] .service-accent {
+  border-color: rgba(11, 31, 77, 0.1);
+  background: #edf2f6 !important;
+  color: #0b1f4d !important;
+}
+
+:root[data-theme="formal"] .workflow-section {
+  border-color: rgba(11, 31, 77, 0.12);
+  background: #f0f3f7;
+  color: #0b1f4d;
+}
+
+:root[data-theme="formal"] .workflow-section h2 {
+  color: #0b1f4d;
+}
+
+:root[data-theme="formal"] .workflow-section > div > p,
+:root[data-theme="formal"] .workflow-section .text-paper\/60 {
+  color: #64748b;
+}
+
+:root[data-theme="formal"] .workflow-section .border-paper\/30 {
+  border-color: rgba(11, 31, 77, 0.14);
+  background: #fff;
+}
+
+:root[data-theme="formal"] .workflow-section .bg-goldc {
+  border-color: #087f8c;
+  background: #087f8c;
+  color: #fff;
+}
+
+:root[data-theme="formal"] .project-card {
+  margin-top: 0 !important;
+  border-color: rgba(11, 31, 77, 0.14);
+  box-shadow: 0 4px 18px rgba(11, 31, 77, 0.055) !important;
+}
+
+:root[data-theme="formal"] .corporate-cta {
+  border: 0;
+  border-right: 5px solid #087f8c;
+  border-radius: 6px;
+  background: #edf2f6;
+  box-shadow: none !important;
+}
+
+.theme-picker summary::-webkit-details-marker {
+  display: none;
+}
+
+@keyframes partner-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(50%);
+  }
+}
+
+.partner-track {
+  animation: partner-scroll 34s linear infinite;
+}
+
+.partner-marquee:hover .partner-track {
+  animation-play-state: paused;
+}
+
+.partner-card,
+.partner-mark {
+  border-radius: 8px;
+}
+
+:root[data-theme="formal"] .trust-section {
+  background:
+    linear-gradient(90deg, rgba(11, 31, 77, 0.025), rgba(8, 127, 140, 0.035)),
+    #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partner-track,
+  .marquee-track {
+    animation-play-state: paused;
+  }
 }
 
 /* تیترها با فونت نمایشی لاله‌زار — حس پوستر چاپی */

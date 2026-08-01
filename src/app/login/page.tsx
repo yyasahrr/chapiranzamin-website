@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SiteHeader from "@/components/site-header";
+import { readApiResponse } from "@/lib/client-api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [nextPath, setNextPath] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("next");
+    if (requested?.startsWith("/") && !requested.startsWith("//"))
+      queueMicrotask(() => setNextPath(requested));
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,12 +27,22 @@ export default function LoginPage() {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      window.location.href = data.user.role === "admin" ? "/admin" : "/dashboard";
+      const data = await readApiResponse<{
+        message?: string;
+        user: { role: string };
+      }>(res);
+      const destination = nextPath || (
+        ["admin", "content_admin", "support"].includes(data.user.role)
+          ? "/admin"
+          : "/dashboard"
+      );
+      router.replace(destination);
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "خطا در ورود");
       setLoading(false);
@@ -57,6 +75,12 @@ export default function LoginPage() {
                 dir="ltr" value={password}
                 onChange={(e) => setPassword(e.target.value)} required
               />
+              <Link
+                href="/reset-password"
+                className="mt-2 inline-block text-[10px] font-bold text-cyanink"
+              >
+                رمز عبور را فراموش کرده‌اید؟
+              </Link>
             </div>
             {error && (
               <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{error}</div>
@@ -70,10 +94,7 @@ export default function LoginPage() {
           </form>
           <p className="mt-5 text-center text-xs text-ink-700/70">
             حساب ندارید؟{" "}
-            <Link href="/register" className="font-bold text-cyanink">ثبت‌نام کنید</Link>
-          </p>
-          <p className="mt-4 rounded-lg bg-paper px-3 py-2 text-center text-[11px] text-ink-700/60">
-            حساب آزمایشی مدیر: <span dir="ltr">09120000000</span> / <span dir="ltr">Admin123!</span>
+            <Link href={`/register${nextPath ? `?next=${encodeURIComponent(nextPath)}` : ""}`} className="font-bold text-cyanink">ثبت‌نام کنید</Link>
           </p>
         </div>
       </div>

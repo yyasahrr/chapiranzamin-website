@@ -34,10 +34,22 @@ export default function SiteFooter() {
           <ul className="space-y-2 text-sm text-paper/70">
             <li><Link href="/services" className="hover:text-goldc">▪ خدمات</Link></li>
             <li><Link href="/portfolio" className="hover:text-goldc">▪ نمونه‌کارها</Link></li>
-            <li><Link href="/request" className="hover:text-goldc">▪ ثبت درخواست مشاوره</Link></li>
-            <li><Link href="/request?type=organization" className="hover:text-goldc">▪ همکاری سازمانی</Link></li>
+            <li><Link href="/request" className="hover:text-goldc">▪ ثبت سفارش</Link></li>
+            <li><Link href="/organization-consultation" className="hover:text-goldc">▪ همکاری سازمانی</Link></li>
             <li><Link href="/track" className="hover:text-goldc">▪ رهگیری درخواست</Link></li>
           </ul>
+          <div className="mt-5 flex gap-2" aria-label="شبکه‌های اجتماعی">
+            {[
+              ["اینستاگرام", process.env.NEXT_PUBLIC_INSTAGRAM_URL],
+              ["تلگرام", process.env.NEXT_PUBLIC_TELEGRAM_URL],
+              ["لینکدین", process.env.NEXT_PUBLIC_LINKEDIN_URL],
+            ].filter((item): item is [string, string] => Boolean(item[1])).map(([label, href]) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                className="grid h-9 min-w-9 place-items-center border border-paper/40 px-2 text-[10px] font-black hover:border-goldc hover:text-goldc">
+                {label.slice(0, 2)}
+              </a>
+            ))}
+          </div>
         </div>
         <div>
           <h4 className="mb-4 inline-block bg-goldc px-2 py-0.5 text-sm font-black text-ink-900">

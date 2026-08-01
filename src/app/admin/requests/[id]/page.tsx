@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
   ItemsList,
+  FilesList,
+  type DetailFile,
   MessageThread,
   InfoRow,
   type DetailItem,
@@ -37,8 +39,14 @@ type Detail = {
     adminNotes: string | null;
     meetingScheduledAt: string | null;
     createdAt: string;
+    estimatedTotal: string;
+    finalTotal: string | null;
+    shippingMethod: string;
+    deliveryAddress: string | null;
+    shippingTrackingCode: string | null;
   };
   items: DetailItem[];
+  files: DetailFile[];
   messages: DetailMessage[];
   organization: {
     name: string;
@@ -46,6 +54,7 @@ type Detail = {
     phone: string | null;
     address: string | null;
   } | null;
+  permissions: { canManage: boolean; canReply: boolean };
 };
 
 export default function AdminRequestDetailPage() {
@@ -56,7 +65,9 @@ export default function AdminRequestDetailPage() {
   const [saving, setSaving] = useState(false);
   const [notes, setNotes] = useState("");
   const [meeting, setMeeting] = useState("");
+  const [finalPrice, setFinalPrice] = useState("");
   const [saved, setSaved] = useState("");
+  const [shippingCode, setShippingCode] = useState("");
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/requests/${id}`);
@@ -66,6 +77,8 @@ export default function AdminRequestDetailPage() {
     const d: Detail = await res.json();
     setData(d);
     setNotes(d.request.adminNotes ?? "");
+    setFinalPrice(d.request.finalTotal ?? d.request.estimatedTotal ?? "");
+    setShippingCode(d.request.shippingTrackingCode ?? "");
     if (d.request.meetingScheduledAt) {
       const dt = new Date(d.request.meetingScheduledAt);
       setMeeting(new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16));
@@ -73,7 +86,8 @@ export default function AdminRequestDetailPage() {
   }, [id, router]);
 
   useEffect(() => {
-    load();
+    const timeoutId = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timeoutId);
   }, [load]);
 
   async function patch(body: Record<string, unknown>, message = "ذخیره شد ✓") {
@@ -122,10 +136,18 @@ export default function AdminRequestDetailPage() {
             {saved && <span className="text-xs font-bold text-emerald-600">{saved}</span>}
           </div>
         </div>
+        <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
+          <span className="text-xs font-bold text-slate-500">ارزش سفارش:</span>
+          <strong className="mr-3">
+            {Number(r.finalTotal ?? r.estimatedTotal) > 0
+              ? `${Number(r.finalTotal ?? r.estimatedTotal).toLocaleString("fa-IR")} تومان`
+              : "نیازمند قیمت‌گذاری"}
+          </strong>
+        </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className={`mt-6 grid gap-6 ${data.permissions.canManage ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
           {/* ستون مدیریت */}
-          <div className="space-y-6">
+          {data.permissions.canManage && <div className="space-y-6">
             <div className="border-2 border-ink-900 bg-white shadow-[4px_4px_0_0_#141414] p-6">
               <h2 className="mb-4 font-black text-ink-900">مدیریت وضعیت</h2>
               <label className="mb-1.5 block text-xs font-bold text-ink-700">وضعیت درخواست</label>
@@ -167,6 +189,39 @@ export default function AdminRequestDetailPage() {
               >
                 ثبت جلسه
               </button>
+
+              <label className="mb-1.5 mt-4 block text-xs font-bold text-ink-700">قیمت نهایی سفارش (تومان)</label>
+              <input
+                type="number"
+                min={0}
+                dir="ltr"
+                value={finalPrice}
+                onChange={(e) => setFinalPrice(e.target.value)}
+                className="w-full rounded-lg border-2 border-ink-900 px-3.5 py-2.5 text-sm outline-none"
+              />
+              <button
+                onClick={() => patch({ finalTotal: finalPrice }, "قیمت نهایی ثبت شد ✓")}
+                disabled={saving || !finalPrice}
+                className="mt-2 w-full border-2 border-ink-900 bg-goldc py-2.5 text-sm font-bold disabled:opacity-50"
+              >
+                ثبت قیمت نهایی
+              </button>
+
+              <label className="mb-1.5 mt-4 block text-xs font-bold text-ink-700">کد رهگیری مرسوله</label>
+              <input
+                dir="ltr"
+                value={shippingCode}
+                onChange={(e) => setShippingCode(e.target.value)}
+                placeholder="کد پست یا پیک"
+                className="w-full rounded-lg border-2 border-ink-900 px-3.5 py-2.5 text-sm outline-none"
+              />
+              <button
+                onClick={() => patch({ shippingTrackingCode: shippingCode }, "کد مرسوله ثبت شد ✓")}
+                disabled={saving}
+                className="mt-2 w-full border-2 border-ink-900 bg-sky-200 py-2.5 text-sm font-bold disabled:opacity-50"
+              >
+                ذخیره اطلاعات ارسال
+              </button>
             </div>
 
             <div className="rounded-2xl border border-goldc/40 bg-white p-6">
@@ -188,7 +243,7 @@ export default function AdminRequestDetailPage() {
                 ذخیره یادداشت
               </button>
             </div>
-          </div>
+          </div>}
 
           {/* ستون اطلاعات */}
           <div className="space-y-6">
@@ -202,6 +257,17 @@ export default function AdminRequestDetailPage() {
               {r.desiredDeliveryDate && (
                 <InfoRow label="تحویل موردنظر" value={formatDate(r.desiredDeliveryDate)} />
               )}
+              <InfoRow
+                label="روش دریافت"
+                value={
+                  r.shippingMethod === "courier"
+                    ? "پیک شهری"
+                    : r.shippingMethod === "post"
+                      ? "ارسال پستی"
+                      : "تحویل حضوری"
+                }
+              />
+              {r.deliveryAddress && <InfoRow label="آدرس تحویل" value={r.deliveryAddress} />}
               <InfoRow
                 label="خدمات تکمیلی"
                 value={
@@ -234,6 +300,8 @@ export default function AdminRequestDetailPage() {
                 آیتم‌ها ({data.items.length.toLocaleString("fa-IR")})
               </h2>
               <ItemsList items={data.items} />
+              <h3 className="mb-3 mt-6 text-sm font-black">فایل‌های طرح</h3>
+              <FilesList files={data.files ?? []} />
             </div>
           </div>
 
@@ -242,7 +310,7 @@ export default function AdminRequestDetailPage() {
             <h2 className="mb-4 font-black text-ink-900">گفت‌وگو با متقاضی</h2>
             <MessageThread
               messages={data.messages}
-              viewerRole="admin"
+              viewerRole="staff"
               onSend={sendMessage}
               sending={sending}
             />

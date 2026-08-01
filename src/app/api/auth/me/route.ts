@@ -1,9 +1,8 @@
-import { getSessionUser, publicUser } from "@/lib/auth";
+import type { NextRequest } from "next/server";
+import { proxyPhpRequest } from "@/lib/php-backend";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const user = await getSessionUser();
-  if (!user) return Response.json({ user: null }, { status: 401 });
-  return Response.json({ user: publicUser(user) });
+export function GET(request: NextRequest) {
+  return proxyPhpRequest(request, "/api/auth/me");
 }

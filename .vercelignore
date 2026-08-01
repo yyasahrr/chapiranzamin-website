@@ -1,0 +1,7 @@
+.data/
+.dev-server*.log
+docs/
+php-backend/
+tests/
+README.md
+*.tsbuildinfo

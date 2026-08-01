@@ -6,6 +6,8 @@ import { useCallback, useEffect, useState } from "react";
 import SiteHeader from "@/components/site-header";
 import {
   ItemsList,
+  FilesList,
+  type DetailFile,
   MessageThread,
   InfoRow,
   type DetailItem,
@@ -35,8 +37,11 @@ type Detail = {
     description: string | null;
     meetingScheduledAt: string | null;
     createdAt: string;
+    estimatedTotal: string;
+    finalTotal: string | null;
   };
   items: DetailItem[];
+  files: DetailFile[];
   messages: DetailMessage[];
   organization: { name: string; organizationType: string | null } | null;
 };
@@ -55,7 +60,8 @@ export default function CustomerRequestDetailPage() {
   }, [id, router]);
 
   useEffect(() => {
-    load();
+    const timeoutId = window.setTimeout(() => void load(), 0);
+    return () => window.clearTimeout(timeoutId);
   }, [load]);
 
   async function sendMessage(text: string) {
@@ -91,6 +97,14 @@ export default function CustomerRequestDetailPage() {
           <span className={`rounded-full px-4 py-1.5 text-xs font-bold ${STATUS_COLORS[r.status]}`}>
             {STATUS_LABELS[r.status]}
           </span>
+        </div>
+        <div className="mt-4 rounded-lg border border-ink-900 bg-goldc p-4">
+          <span className="text-xs font-bold">مبلغ سفارش</span>
+          <strong className="mr-3 text-lg">
+            {Number(r.finalTotal ?? r.estimatedTotal) > 0
+              ? `${Number(r.finalTotal ?? r.estimatedTotal).toLocaleString("fa-IR")} تومان`
+              : "در انتظار قیمت‌گذاری کارشناس"}
+          </strong>
         </div>
 
         {r.meetingScheduledAt && (
@@ -133,6 +147,8 @@ export default function CustomerRequestDetailPage() {
                 آیتم‌ها ({data.items.length.toLocaleString("fa-IR")})
               </h2>
               <ItemsList items={data.items} />
+              <h3 className="mb-3 mt-6 text-sm font-black">فایل‌های طرح</h3>
+              <FilesList files={data.files ?? []} />
             </div>
           </div>
 

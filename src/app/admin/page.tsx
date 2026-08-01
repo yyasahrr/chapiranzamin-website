@@ -1,207 +1,283 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import {
-  PRIORITY_LABELS,
-  REQUEST_TYPE_LABELS,
-  STATUS_COLORS,
-  STATUS_LABELS,
-  STATUS_ORDER,
-  formatDate,
-} from "@/lib/constants";
+import { useEffect, useState } from "react";
+import { STATUS_LABELS, formatDate } from "@/lib/constants";
+import { readApiResponse } from "@/lib/client-api";
 
-type Stats = {
-  byStatus: { status: string; count: number }[];
-  totalRequests: number;
-  customerCount: number;
-  organizationCount: number;
+type Overview = {
+  metrics: { users: number; openOrders: number; tickets: number; revenue: number };
+  requests: {
+    id: number;
+    trackingCode: string;
+    contactName: string;
+    status: string;
+    priority: string;
+    createdAt: string;
+  }[];
+  services: { id: number; name: string; active: boolean }[];
 };
 
-type Row = {
-  id: number;
-  trackingCode: string;
-  contactName: string;
-  contactPhone: string;
-  requestType: string;
-  status: string;
-  priority: string;
-  createdAt: string;
-  organizationName: string | null;
-  itemCount: number;
-};
+const money = (value: number) => `${value.toLocaleString("fa-IR")} تومان`;
 
 export default function AdminPage() {
-  const router = useRouter();
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [rows, setRows] = useState<Row[]>([]);
-  const [status, setStatus] = useState("");
-  const [q, setQ] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const loadRequests = useCallback(async () => {
-    const params = new URLSearchParams();
-    if (status) params.set("status", status);
-    if (q) params.set("q", q);
-    const res = await fetch(`/api/admin/requests?${params}`);
-    if (res.ok) setRows((await res.json()).requests);
-  }, [status, q]);
+  const [data, setData] = useState<Overview | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    (async () => {
-      const me = await fetch("/api/auth/me");
-      if (!me.ok) return router.replace("/login");
-      const d = await me.json();
-      if (d.user.role !== "admin") return router.replace("/dashboard");
-      const s = await fetch("/api/admin/stats");
-      if (s.ok) setStats(await s.json());
-      setLoading(false);
-    })();
-  }, [router]);
+    fetch("/api/admin/overview", { cache: "no-store" })
+      .then((response) => readApiResponse<Overview & { message?: string }>(response))
+      .then(setData)
+      .catch(() => setError("اطلاعات داشبورد دریافت نشد؛ صفحه را تازه‌سازی کنید."));
+  }, []);
 
-  useEffect(() => {
-    if (!loading) loadRequests();
-  }, [loading, loadRequests]);
-
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/";
-  }
-
-  if (loading)
-    return <p className="py-24 text-center text-sm text-ink-700/60">در حال بارگذاری...</p>;
-
-  const statusCount = (s: string) =>
-    stats?.byStatus.find((x) => x.status === s)?.count ?? 0;
+  const metrics = [
+    ["درآمد وصول‌شده", money(data?.metrics.revenue ?? 0), "فاکتورهای پرداخت‌شده", "text-emerald-600"],
+    ["سفارش‌های فعال", (data?.metrics.openOrders ?? 0).toLocaleString("fa-IR"), "در خط تولید", "text-violet-600"],
+    ["کل درخواست‌ها", (data?.metrics.tickets ?? 0).toLocaleString("fa-IR"), "ثبت‌شده در سامانه", "text-amber-600"],
+    ["مشتریان", (data?.metrics.users ?? 0).toLocaleString("fa-IR"), "حساب فعال", "text-cyan-600"],
+  ];
+  const requests = data?.requests ?? [];
+  const primaryStatuses = [
+    ["new", "جدید", "#7c3aed"],
+    ["under_review", "بررسی", "#06b6d4"],
+    ["in_production", "تولید", "#f59e0b"],
+    ["completed", "تکمیل", "#10b981"],
+    ["cancelled", "لغو", "#ef4444"],
+  ].map(([key, label, color]) => ({
+    key,
+    label,
+    color,
+    count: requests.filter((request) => request.status === key).length,
+  }));
+  const primaryStatusKeys = new Set(primaryStatuses.map((item) => item.key));
+  const statusChart = [
+    ...primaryStatuses,
+    {
+      key: "other",
+      label: "سایر مراحل",
+      color: "#94a3b8",
+      count: requests.filter((request) => !primaryStatusKeys.has(request.status)).length,
+    },
+  ];
+  const chartTotal = Math.max(1, statusChart.reduce((sum, item) => sum + item.count, 0));
+  let donutCursor = 0;
+  const donutGradient = statusChart
+    .map((item) => {
+      const start = donutCursor;
+      donutCursor += (item.count / chartTotal) * 100;
+      return `${item.color} ${start}% ${donutCursor}%`;
+    })
+    .join(", ");
+  const dailyOrders = Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - (6 - offset));
+    const next = new Date(date);
+    next.setDate(next.getDate() + 1);
+    return {
+      label: new Intl.DateTimeFormat("fa-IR", { weekday: "narrow" }).format(date),
+      count: requests.filter((request) => {
+        const created = new Date(request.createdAt);
+        return created >= date && created < next;
+      }).length,
+    };
+  });
+  const maxDaily = Math.max(1, ...dailyOrders.map((item) => item.count));
+  const linePoints = dailyOrders
+    .map((item, index) => `${index * 50 + 10},${105 - (item.count / maxDaily) * 80}`)
+    .join(" ");
+  const priorities = [
+    ["عادی", requests.filter((item) => !["high", "urgent"].includes(item.priority)).length, "#64748b"],
+    ["بالا", requests.filter((item) => item.priority === "high").length, "#f59e0b"],
+    ["فوری", requests.filter((item) => item.priority === "urgent").length, "#ef4444"],
+  ] as const;
+  const maxPriority = Math.max(1, ...priorities.map((item) => item[1]));
 
   return (
-    <div className="min-h-screen bg-paper">
-      <header className="border-b border-ink-900/30 bg-ink-900 text-paper">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-reg text-lg font-black">چ</span>
-            <span className="font-extrabold">پنل مدیریت چاپ ایران‌زمین</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-sm text-paper/70 hover:text-white">نمایش سایت</Link>
-            <button onClick={logout} className="rounded-lg border border-paper/30 px-4 py-2 text-sm font-bold hover:bg-paper hover:text-ink-900">
-              خروج
-            </button>
-          </div>
+    <div className="mx-auto max-w-[1500px]">
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-700">
+          {error}
         </div>
-      </header>
+      )}
+      <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold text-violet-600">Workspace / Overview</p>
+          <h1 className="mt-1 text-2xl font-black tracking-tight">مرکز کنترل کسب‌وکار</h1>
+          <p className="mt-1 text-xs text-slate-500">وضعیت لحظه‌ای فروش، تولید و ارتباط با مشتری</p>
+        </div>
+        <div className="flex gap-2">
+          <Link href="/admin/services" className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-bold shadow-sm hover:bg-slate-50">
+            مدیریت خدمات
+          </Link>
+          <Link href="/request" className="rounded-md bg-slate-950 px-3 py-2 text-xs font-bold text-white shadow-sm hover:bg-violet-700">
+            + سفارش جدید
+          </Link>
+        </div>
+      </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        {/* آمار */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-6">
-          {[
-            ["کل درخواست‌ها", stats?.totalRequests ?? 0, "text-ink-900"],
-            ["جدید", statusCount("new"), "text-blue-600"],
-            ["در حال بررسی", statusCount("under_review"), "text-amber-600"],
-            ["قرارداد بسته شد", statusCount("contracted"), "text-emerald-600"],
-            ["مشتریان", stats?.customerCount ?? 0, "text-cyanink"],
-            ["سازمان‌ها", stats?.organizationCount ?? 0, "text-goldc-dark"],
-          ].map(([t, n, c]) => (
-            <div key={t as string} className="border-2 border-ink-900 bg-white shadow-[4px_4px_0_0_#141414] p-4 text-center">
-              <div className={`text-2xl font-black ${c}`}>{Number(n).toLocaleString("fa-IR")}</div>
-              <div className="mt-1 text-[11px] text-ink-700/70">{t}</div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {metrics.map(([label, value, hint, color]) => (
+          <div key={label} className="rounded-lg border border-slate-200 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,.04)]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-500">{label}</span>
+              <span className={`text-xs ${color}`}>●</span>
             </div>
-          ))}
-        </div>
+            <p className="mt-3 text-2xl font-black tracking-tight">{value}</p>
+            <p className="mt-1 text-[10px] text-slate-400">{hint}</p>
+          </div>
+        ))}
+      </div>
 
-        {/* فیلترها */}
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="جست‌وجو: کد رهگیری، نام یا موبایل..."
-            className="flex-1 rounded-xl border-2 border-ink-900 bg-white px-4 py-2.5 text-sm outline-none focus:border-cyanink"
-          />
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="rounded-xl border-2 border-ink-900 bg-white px-4 py-2.5 text-sm outline-none"
-          >
-            <option value="">همه وضعیت‌ها</option>
-            {STATUS_ORDER.map((s) => (
-              <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* جدول دسکتاپ */}
-        <div className="mt-5 hidden overflow-hidden border-2 border-ink-900 bg-white shadow-[4px_4px_0_0_#141414] md:block">
-          <table className="w-full text-sm">
-            <thead className="bg-paper-dark text-xs text-ink-700">
-              <tr>
-                <th className="px-4 py-3 text-right">کد رهگیری</th>
-                <th className="px-4 py-3 text-right">متقاضی</th>
-                <th className="px-4 py-3 text-right">نوع</th>
-                <th className="px-4 py-3 text-right">آیتم‌ها</th>
-                <th className="px-4 py-3 text-right">وضعیت</th>
-                <th className="px-4 py-3 text-right">اولویت</th>
-                <th className="px-4 py-3 text-right">تاریخ</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-ink-900/15 hover:bg-paper/60">
-                  <td className="px-4 py-3 font-bold" dir="ltr">{r.trackingCode}</td>
-                  <td className="px-4 py-3">
-                    <div className="font-bold">{r.contactName}</div>
-                    <div className="text-xs text-ink-700/60" dir="ltr">{r.contactPhone}</div>
-                    {r.organizationName && (
-                      <div className="text-xs text-cyanink">{r.organizationName}</div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-xs">{REQUEST_TYPE_LABELS[r.requestType]}</td>
-                  <td className="px-4 py-3">{Number(r.itemCount).toLocaleString("fa-IR")}</td>
-                  <td className="px-4 py-3">
-                    <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${STATUS_COLORS[r.status]}`}>
-                      {STATUS_LABELS[r.status]}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-xs">{PRIORITY_LABELS[r.priority]}</td>
-                  <td className="px-4 py-3 text-xs">{formatDate(r.createdAt)}</td>
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/requests/${r.id}`} className="font-bold text-cyanink hover:text-reg">
-                      مدیریت
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
+      <div className="mt-5 grid gap-5 xl:grid-cols-[1.5fr_.8fr]">
+        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+          <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <div>
+              <h2 className="text-sm font-black">جریان سفارش‌ها</h2>
+              <p className="mt-1 text-[10px] text-slate-400">آخرین فعالیت‌های عملیاتی</p>
+            </div>
+            <Link href="/admin/orders" className="text-xs font-bold text-violet-600">مشاهده همه ←</Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[650px] text-right text-xs">
+              <thead className="bg-slate-50 text-[10px] text-slate-400">
                 <tr>
-                  <td colSpan={8} className="px-4 py-10 text-center text-ink-700/50">
-                    درخواستی یافت نشد.
-                  </td>
+                  <th className="px-5 py-3 font-semibold">شناسه</th>
+                  <th className="px-4 py-3 font-semibold">مشتری</th>
+                  <th className="px-4 py-3 font-semibold">وضعیت</th>
+                  <th className="px-4 py-3 font-semibold">اولویت</th>
+                  <th className="px-4 py-3 font-semibold">تاریخ</th>
+                  <th className="px-4 py-3" />
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {(data?.requests ?? []).slice(0, 8).map((request) => (
+                  <tr key={request.id} className="border-t border-slate-100 hover:bg-slate-50/70">
+                    <td className="px-5 py-3.5 font-mono font-bold" dir="ltr">{request.trackingCode}</td>
+                    <td className="px-4 py-3.5 font-semibold">{request.contactName}</td>
+                    <td className="px-4 py-3.5">
+                      <span className="rounded-full bg-violet-50 px-2 py-1 text-[10px] font-bold text-violet-700">
+                        {STATUS_LABELS[request.status]}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 text-slate-500">{request.priority === "urgent" ? "فوری" : request.priority === "high" ? "بالا" : "عادی"}</td>
+                    <td className="px-4 py-3.5 text-slate-500">{formatDate(request.createdAt)}</td>
+                    <td className="px-4 py-3.5">
+                      <Link href={`/admin/requests/${request.id}`} className="text-violet-600">بازکردن</Link>
+                    </td>
+                  </tr>
+                ))}
+                {!data?.requests.length && (
+                  <tr><td colSpan={6} className="py-14 text-center text-slate-400">هنوز سفارشی ثبت نشده است.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-        {/* کارت موبایل */}
-        <div className="mt-5 space-y-3 md:hidden">
-          {rows.map((r) => (
-            <Link
-              key={r.id}
-              href={`/admin/requests/${r.id}`}
-              className="block border-2 border-ink-900 bg-white shadow-[4px_4px_0_0_#141414] p-4"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-black" dir="ltr">{r.trackingCode}</span>
-                <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${STATUS_COLORS[r.status]}`}>
-                  {STATUS_LABELS[r.status]}
-                </span>
+        <div className="space-y-5">
+          <section className="rounded-lg border border-slate-200 bg-white p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-sm font-black">تحلیل سفارش‌ها</h2>
+                <p className="mt-1 text-[10px] text-slate-400">نمای زنده از عملکرد عملیاتی</p>
               </div>
-              <div className="mt-2 text-xs text-ink-700/70">
-                {r.contactName} • {REQUEST_TYPE_LABELS[r.requestType]} • {formatDate(r.createdAt)}
+              <span className="rounded bg-emerald-50 px-2 py-1 text-[9px] font-bold text-emerald-700">داده واقعی</span>
+            </div>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-[11px] font-black">روند ۷ روزه</h3>
+                  <span className="text-[9px] text-slate-400">نمودار خطی</span>
+                </div>
+                <svg viewBox="0 0 320 120" className="mt-3 h-28 w-full" role="img" aria-label="روند سفارش‌های هفت روز گذشته">
+                  {[25, 65, 105].map((y) => (
+                    <line key={y} x1="10" y1={y} x2="310" y2={y} stroke="#e2e8f0" strokeWidth="1" />
+                  ))}
+                  <polyline points={linePoints} fill="none" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                  {dailyOrders.map((item, index) => (
+                    <circle key={index} cx={index * 50 + 10} cy={105 - (item.count / maxDaily) * 80} r="4" fill="#fff" stroke="#7c3aed" strokeWidth="3">
+                      <title>{item.label}: {item.count.toLocaleString("fa-IR")} سفارش</title>
+                    </circle>
+                  ))}
+                </svg>
+                <div className="flex justify-between text-[9px] text-slate-400">
+                  {dailyOrders.map((item, index) => <span key={index}>{item.label}</span>)}
+                </div>
               </div>
-            </Link>
-          ))}
+
+              <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-[11px] font-black">وضعیت سفارش‌ها</h3>
+                  <span className="text-[9px] text-slate-400">دوناتی</span>
+                </div>
+                <div className="mt-4 flex items-center gap-4">
+                  <div
+                    className="relative grid h-28 w-28 shrink-0 place-items-center rounded-full"
+                    style={{ background: `conic-gradient(${donutGradient || "#e2e8f0 0 100%"})` }}
+                    role="img"
+                    aria-label={`توزیع وضعیت ${requests.length.toLocaleString("fa-IR")} سفارش`}
+                  >
+                    <div className="grid h-16 w-16 place-items-center rounded-full bg-white text-center">
+                      <span className="text-lg font-black">{requests.length.toLocaleString("fa-IR")}</span>
+                    </div>
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    {statusChart.map((item) => (
+                      <div key={item.key} className="flex items-center gap-2 text-[9px]">
+                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="flex-1 text-slate-500">{item.label}</span>
+                        <b>{item.count.toLocaleString("fa-IR")}</b>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-slate-100 bg-slate-50/70 p-4 sm:col-span-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-[11px] font-black">توزیع اولویت</h3>
+                  <span className="text-[9px] text-slate-400">نمودار ستونی</span>
+                </div>
+                <div className="mt-5 flex h-28 items-end justify-around gap-8">
+                  {priorities.map(([label, count, color]) => (
+                    <div key={label} className="flex h-full flex-1 flex-col items-center justify-end">
+                      <span className="mb-1 text-[9px] font-bold">{count.toLocaleString("fa-IR")}</span>
+                      <div
+                        className="w-full max-w-16 rounded-t-md transition-all"
+                        style={{
+                          height: `${Math.max(8, (count / maxPriority) * 82)}%`,
+                          backgroundColor: color,
+                        }}
+                      />
+                      <span className="mt-2 text-[9px] text-slate-500">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-white p-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-black">سلامت سیستم</h2>
+              <span className="text-[10px] font-bold text-emerald-600">● عملیاتی</span>
+            </div>
+            <div className="mt-4 space-y-3 text-xs">
+              {[
+                ["API و احراز هویت", "پاسخ‌گو"],
+                ["پایگاه داده", "متصل"],
+                ["خدمات فعال", `${data?.services.filter((s) => s.active).length ?? 0} مورد`],
+              ].map(([label, value]) => (
+                <div key={label} className="flex justify-between border-b border-slate-100 pb-2 last:border-0">
+                  <span className="text-slate-500">{label}</span>
+                  <span className="font-bold">{value}</span>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </div>

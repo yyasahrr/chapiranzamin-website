@@ -20,15 +20,33 @@ export type DetailItem = {
   requiresPermit: boolean;
   requiresInstallationTeam: boolean;
   description: string | null;
+  selectedOptions: string;
 };
 
 export type DetailMessage = {
   id: number;
   message: string;
-  senderRole: "admin" | "customer";
+  senderRole: "admin" | "content_admin" | "support" | "customer";
   senderName: string;
   createdAt: string;
 };
+
+export type DetailFile = { token: string; name: string; size: number; mimeType: string };
+
+export function FilesList({ files }: { files: DetailFile[] }) {
+  if (!files.length) return <p className="text-xs text-ink-700/50">فایلی پیوست نشده است.</p>;
+  return (
+    <div className="space-y-2">
+      {files.map((file) => (
+        <a key={file.token} href={`/api/order-files/${file.token}`}
+          className="flex items-center justify-between border border-ink-900/20 bg-paper p-3 text-xs font-bold hover:border-cyanink">
+          <span>{file.name}</span>
+          <span>{(file.size / 1024 / 1024).toFixed(1)} MB ↓</span>
+        </a>
+      ))}
+    </div>
+  );
+}
 
 export function ItemsList({ items }: { items: DetailItem[] }) {
   return (
@@ -49,6 +67,21 @@ export function ItemsList({ items }: { items: DetailItem[] }) {
               </span>
             )}
             {it.material && <span>متریال: {it.material}</span>}
+            {(() => {
+              try {
+                const options = JSON.parse(it.selectedOptions || "[]") as Array<{
+                  groupLabel: string;
+                  label: string;
+                }>;
+                return options.map((option) => (
+                  <span key={option.groupLabel}>
+                    {option.groupLabel}: {option.label}
+                  </span>
+                ));
+              } catch {
+                return null;
+              }
+            })()}
             {it.installationLocation && <span>محل نصب: {it.installationLocation}</span>}
             {it.installationAddress && (
               <span className="sm:col-span-2">آدرس نصب: {it.installationAddress}</span>
@@ -75,7 +108,7 @@ export function MessageThread({
   sending,
 }: {
   messages: DetailMessage[];
-  viewerRole: "admin" | "customer";
+  viewerRole: "staff" | "customer";
   onSend: (text: string) => Promise<void>;
   sending: boolean;
 }) {
@@ -88,7 +121,10 @@ export function MessageThread({
           </p>
         )}
         {messages.map((m) => {
-          const mine = m.senderRole === viewerRole;
+          const mine =
+            viewerRole === "staff"
+              ? m.senderRole !== "customer"
+              : m.senderRole === "customer";
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div
@@ -99,7 +135,7 @@ export function MessageThread({
                 }`}
               >
                 <div className={`mb-1 text-[10px] font-bold ${mine ? "text-white/70" : "text-ink-700/60"}`}>
-                  {m.senderRole === "admin" ? "کارشناس چاپ ایران‌زمین" : m.senderName} •{" "}
+                  {m.senderRole !== "customer" ? "کارشناس چاپ ایران‌زمین" : m.senderName} •{" "}
                   {formatDateTime(m.createdAt)}
                 </div>
                 {m.message}

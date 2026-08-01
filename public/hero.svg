@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">تابلوی تبلیغاتی چاپ ایران‌زمین</title>
+  <desc id="desc">تصویرسازی یک بیلبورد شهری با رنگ‌های هویت بصری چاپ ایران‌زمین</desc>
+  <rect width="1200" height="800" fill="#2036e8"/>
+  <circle cx="1040" cy="120" r="210" fill="#c6f432"/>
+  <path d="M0 610 210 430l170 105 205-240 210 190 170-125 235 250v190H0Z" fill="#1526b8"/>
+  <rect x="185" y="155" width="830" height="410" fill="#f2efe6" stroke="#141414" stroke-width="22"/>
+  <rect x="225" y="195" width="750" height="330" fill="#ff4d12"/>
+  <text x="600" y="340" fill="#fff" font-family="Tahoma, Arial, sans-serif" font-size="76" font-weight="700" text-anchor="middle" direction="rtl">چاپ ایران‌زمین</text>
+  <text x="600" y="425" fill="#141414" font-family="Tahoma, Arial, sans-serif" font-size="38" font-weight="700" text-anchor="middle" direction="rtl">از طراحی تا چاپ و اجرا</text>
+  <path d="M395 565v145M805 565v145M325 710h550" fill="none" stroke="#141414" stroke-width="24"/>
+  <rect y="735" width="1200" height="65" fill="#141414"/>
+</svg>

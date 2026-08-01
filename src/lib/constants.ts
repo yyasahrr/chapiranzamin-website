@@ -19,6 +19,9 @@ export const STATUS_LABELS: Record<string, string> = {
   proposal_sent: "پیشنهاد ارسال شد",
   contracted: "قرارداد بسته شد",
   in_production: "در حال تولید",
+  ready_to_ship: "آماده ارسال",
+  shipped: "ارسال شده",
+  delivered: "تحویل داده شده",
   completed: "تکمیل شده",
   cancelled: "لغو شده",
 };
@@ -31,6 +34,9 @@ export const STATUS_COLORS: Record<string, string> = {
   proposal_sent: "border border-ink-900 bg-indigo-200 text-ink-900",
   contracted: "border border-ink-900 bg-goldc text-ink-900",
   in_production: "border border-ink-900 bg-orange-200 text-ink-900",
+  ready_to_ship: "border border-ink-900 bg-sky-200 text-ink-900",
+  shipped: "border border-ink-900 bg-blue-300 text-ink-900",
+  delivered: "border border-ink-900 bg-emerald-300 text-ink-900",
   completed: "border border-ink-900 bg-green-300 text-ink-900",
   cancelled: "border border-ink-900 bg-red-300 text-ink-900",
 };
@@ -43,6 +49,9 @@ export const STATUS_ORDER = [
   "proposal_sent",
   "contracted",
   "in_production",
+  "ready_to_ship",
+  "shipped",
+  "delivered",
   "completed",
   "cancelled",
 ] as const;

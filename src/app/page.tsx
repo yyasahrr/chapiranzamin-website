@@ -1,6 +1,9 @@
 import Link from "next/link";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
+import TrustPartners from "@/components/trust-partners";
+import OrderQuickStart from "@/components/order-quick-start";
+import { STATIC_SERVICES } from "@/lib/static-services";
 
 const SERVICES = [
   { n: "۰۱", title: "بنر و فلکس مناسبتی", desc: "چاپ بنرهای مناسبتی، مذهبی و شهری با متریال وینیل، مش و فلکس", accent: "bg-reg text-white" },
@@ -12,7 +15,7 @@ const SERVICES = [
 ];
 
 const STEPS = [
-  { n: "۱", t: "ثبت درخواست", d: "فرم درخواست را آنلاین پر کنید؛ بدون نیاز به تماس اولیه" },
+  { n: "۱", t: "ثبت سفارش", d: "فرم سفارش را آنلاین تکمیل و مشخصات پروژه را ثبت کنید" },
   { n: "۲", t: "مشاوره تخصصی", d: "کارشناسان ما تماس می‌گیرند و جلسه مشاوره تنظیم می‌شود" },
   { n: "۳", t: "طراحی و پیشنهاد", d: "طرح اولیه و پیشنهاد فنی متناسب با بودجه سازمان شما" },
   { n: "۴", t: "چاپ و اجرا", d: "چاپ با متریال استاندارد و اجرای دقیق در محل" },
@@ -22,33 +25,44 @@ const STEPS = [
 const TICKER =
   "چاپ بنر ▪ بیلبورد ▪ تبلیغات مناسبتی ▪ پروژه‌های شهری ▪ طراحی گرافیک ▪ نصب و اجرا ▪ پیگیری مجوز ▪ ";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const featuredServices = STATIC_SERVICES.filter(
+    (service) => service.active && service.featured
+  );
+  const visibleServices = featuredServices.length
+    ? featuredServices.map((service, index) => ({
+        n: (index + 1).toLocaleString("fa-IR", { minimumIntegerDigits: 2 }),
+        title: service.name,
+        desc: service.description || "جزئیات این خدمت را در فرم سفارش انتخاب کنید.",
+        accent: ["bg-reg text-white", "bg-cyanink text-white", "bg-goldc text-ink-900", "bg-ink-900 text-goldc"][index % 4],
+      }))
+    : SERVICES;
   return (
     <div className="min-h-screen">
       <SiteHeader />
 
       {/* تیکر متحرک */}
-      <div className="overflow-hidden border-b-2 border-ink-900 bg-ink-900 py-2" dir="ltr">
+      <div className="home-ticker overflow-hidden border-b-2 border-ink-900 bg-ink-900 py-2" dir="ltr">
         <div className="marquee-track">
           <span className="text-sm font-black text-goldc">{TICKER.repeat(4)}</span>
           <span className="text-sm font-black text-goldc">{TICKER.repeat(4)}</span>
         </div>
       </div>
 
-      {/* Hero پوستری */}
-      <section className="border-b-2 border-ink-900">
+      {/* معرفی مجموعه */}
+      <section className="corporate-hero border-b-2 border-ink-900">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2 md:items-center md:py-20">
           <div>
-            <p className="mb-5 inline-block border-2 border-ink-900 bg-goldc px-3 py-1 text-xs font-black shadow-[3px_3px_0_0_#141414]">
-              ★ مورد اعتماد سازمان‌ها، شهرداری‌ها و کسب‌وکارها
+            <p className="hero-eyebrow mb-5 inline-block border-2 border-ink-900 bg-goldc px-3 py-1 text-xs font-black shadow-[3px_3px_0_0_#141414]">
+              راهکار یکپارچه چاپ و تبلیغات سازمانی
             </p>
-            <h1 className="text-5xl leading-[1.25] text-ink-900 md:text-6xl md:leading-[1.2]">
-              از یک طرح
+            <h1 className="corporate-title text-5xl leading-[1.25] text-ink-900 md:text-6xl md:leading-[1.2]">
+              خدمات حرفه‌ای
               <br />
-              تا یک پیام
-              <br />
-              <span className="inline-block -rotate-1 border-2 border-ink-900 bg-reg px-3 text-paper shadow-[5px_5px_0_0_#141414]">
-                در سطح شهر.
+              <span className="corporate-title-accent inline-block text-cyanink">
+                چاپ، تبلیغات و اجرا
               </span>
             </h1>
             <p className="mt-7 max-w-md border-r-4 border-cyanink pr-4 text-sm leading-8 text-ink-700">
@@ -61,7 +75,7 @@ export default function HomePage() {
                 href="/request"
                 className="brut-press border-2 border-ink-900 bg-reg px-7 py-3.5 text-center text-sm font-black text-white shadow-[5px_5px_0_0_#141414]"
               >
-                ثبت درخواست مشاوره ←
+                ثبت سفارش ←
               </Link>
               <Link
                 href="/portfolio"
@@ -76,24 +90,27 @@ export default function HomePage() {
             <div className="border-2 border-ink-900 bg-white p-2 shadow-[8px_8px_0_0_#141414]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/hero.jpg"
+                src="/hero.svg"
                 alt="بیلبورد شهری چاپ ایران‌زمین"
-                className="h-72 w-full object-cover md:h-96"
+                width="1200"
+                height="720"
+                className="poster-hero h-72 w-full object-cover md:h-96"
               />
-              <div className="flex items-center justify-between px-2 py-2 text-[10px] font-black text-ink-700">
-                <span>پروژه: اکران شهری شبانه</span>
-                <span dir="ltr">CMYK / 720dpi</span>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/brand-logo.jpg"
+                alt="لوگوی رسمی چاپ ایران‌زمین"
+                width="600"
+                height="600"
+                className="brand-hero hidden h-72 w-full object-cover md:h-96"
+              />
             </div>
-            <span className="sticker-rotate absolute -top-4 left-4 border-2 border-ink-900 bg-goldc px-3 py-1.5 text-xs font-black shadow-[3px_3px_0_0_#141414]">
-              بدون قیمت خودکار — فقط مشاوره
-            </span>
           </div>
         </div>
       </section>
 
       {/* بلوک‌های آماری */}
-      <section className="border-b-2 border-ink-900">
+      <section className="home-stats border-b-2 border-ink-900">
         <div className="mx-auto grid max-w-6xl grid-cols-2 md:grid-cols-4">
           {[
             ["+۱۵", "سال تجربه چاپ و تبلیغات", "bg-reg text-white"],
@@ -103,7 +120,7 @@ export default function HomePage() {
           ].map(([n, t, cls], i) => (
             <div
               key={t}
-              className={`${cls} border-ink-900 p-6 text-center md:p-8 ${i < 3 ? "border-l-2" : ""} ${i < 2 ? "max-md:border-b-2" : ""}`}
+              className={`stat-card ${cls} border-ink-900 p-6 text-center md:p-8 ${i < 3 ? "border-l-2" : ""} ${i < 2 ? "max-md:border-b-2" : ""}`}
             >
               <div className="text-4xl font-black" dir="ltr">{n}</div>
               <div className="mt-2 text-xs font-bold opacity-90">{t}</div>
@@ -112,26 +129,28 @@ export default function HomePage() {
         </div>
       </section>
 
+      <TrustPartners />
+
       {/* خدمات */}
       <section className="mx-auto max-w-6xl px-4 py-20">
         <div className="mb-12 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-4xl text-ink-900">خدمات چاپ و تبلیغات محیطی</h2>
             <p className="mt-2 text-sm font-bold text-ink-700">
-              بدون نمایش قیمت عمومی — هر پروژه پیشنهاد اختصاصی می‌گیرد.
+              انتخاب خدمت، ثبت مشخصات و دریافت برآورد متناسب با سفارش
             </p>
           </div>
           <span className="hidden border-2 border-ink-900 bg-white px-3 py-1 text-xs font-black shadow-[3px_3px_0_0_#141414] md:inline-block">
-            ۶ سرویس اصلی
+            {visibleServices.length.toLocaleString("fa-IR")} سرویس اصلی
           </span>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s) => (
+          {visibleServices.map((s) => (
             <div
               key={s.title}
-              className="brut-press border-2 border-ink-900 bg-white shadow-[5px_5px_0_0_#141414]"
+              className="service-card brut-press border-2 border-ink-900 bg-white shadow-[5px_5px_0_0_#141414]"
             >
-              <div className={`flex items-center justify-between border-b-2 border-ink-900 px-5 py-2 ${s.accent}`}>
+              <div className={`service-accent flex items-center justify-between border-b-2 border-ink-900 px-5 py-2 ${s.accent}`}>
                 <span className="text-lg font-black">{s.n}</span>
                 <span className="text-xs font-black">▪▪▪</span>
               </div>
@@ -145,7 +164,7 @@ export default function HomePage() {
       </section>
 
       {/* مراحل همکاری */}
-      <section className="border-y-2 border-ink-900 bg-ink-900 py-20 text-paper">
+      <section className="workflow-section border-y-2 border-ink-900 bg-ink-900 py-20 text-paper">
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="mb-3 text-center text-4xl text-goldc">مراحل روشن همکاری</h2>
           <p className="mb-12 text-center text-xs font-bold text-paper/60">
@@ -165,6 +184,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <OrderQuickStart />
+
       {/* نمونه‌کار منتخب */}
       <section className="mx-auto max-w-6xl px-4 py-20">
         <div className="mb-10 flex items-end justify-between">
@@ -178,17 +199,23 @@ export default function HomePage() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["/images/portfolio-billboard.jpg", "بیلبورد بزرگراهی ۳×۶"],
-            ["/images/portfolio-banner.jpg", "بنرهای مناسبتی شهری"],
-            ["/images/portfolio-print.jpg", "چاپ صنعتی وینیل و فلکس"],
-            ["/images/portfolio-signage.jpg", "نصب تابلو سازمانی"],
+            ["/images/portfolio-billboard.svg", "بیلبورد بزرگراهی ۳×۶"],
+            ["/images/portfolio-banner.svg", "بنرهای مناسبتی شهری"],
+            ["/images/portfolio-print.svg", "چاپ صنعتی وینیل و فلکس"],
+            ["/images/portfolio-signage.svg", "نصب تابلو سازمانی"],
           ].map(([src, title], i) => (
             <div
               key={title}
-              className={`brut-press border-2 border-ink-900 bg-white p-2 shadow-[5px_5px_0_0_#141414] ${i % 2 === 1 ? "md:mt-6" : ""}`}
+              className={`project-card brut-press border-2 border-ink-900 bg-white p-2 shadow-[5px_5px_0_0_#141414] ${i % 2 === 1 ? "md:mt-6" : ""}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt={title} className="h-48 w-full object-cover" />
+              <img
+                src={src}
+                alt={title}
+                width="800"
+                height="480"
+                className="h-48 w-full object-cover"
+              />
               <div className="flex items-center justify-between px-1 pt-2 pb-1">
                 <span className="text-xs font-black text-ink-900">{title}</span>
                 <span className="text-[10px] font-black text-reg">▪</span>
@@ -200,7 +227,7 @@ export default function HomePage() {
 
       {/* CTA سازمانی */}
       <section className="mx-auto max-w-6xl px-4 pb-20">
-        <div className="border-2 border-ink-900 bg-goldc p-8 shadow-[8px_8px_0_0_#141414] md:p-12">
+        <div className="corporate-cta border-2 border-ink-900 bg-goldc p-8 shadow-[8px_8px_0_0_#141414] md:p-12">
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <h2 className="text-3xl text-ink-900">
@@ -212,7 +239,7 @@ export default function HomePage() {
               </p>
             </div>
             <Link
-              href="/request?type=organization"
+              href="/organization-consultation"
               className="brut-press shrink-0 border-2 border-ink-900 bg-ink-900 px-7 py-3.5 text-sm font-black text-goldc shadow-[5px_5px_0_0_#ff4d12]"
             >
               درخواست همکاری سازمانی ←
