@@ -7,7 +7,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob:",
-  `connect-src 'self'${isProduction ? "" : " ws: http:"}`,
+  `connect-src 'self'${isProduction ? "" : " ws: wss: http:"}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

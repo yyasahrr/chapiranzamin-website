@@ -19,7 +19,7 @@ export async function generateMetadata({
   if (!post) return {};
 
   return {
-    title: `${post.title} | چاپ ایران‌زمین`,
+    title: `${post.title} | چاپخانه`,
     description: post.excerpt,
     alternates: { canonical: `/blog/${slug}` },
     openGraph: {

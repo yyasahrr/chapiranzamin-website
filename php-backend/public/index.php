@@ -9,11 +9,11 @@ $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $requestUri = trim($requestUri, '/');
 
 $segments = explode('/', $requestUri);
-$base = array_shift($segments); // usually empty or 'index.php'
 
-// Remove 'index.php' from path if present
-if ($base === 'index.php') {
-    $base = array_shift($segments);
+// Remove 'index.php' from path if present (PATH_INFO style URLs); the API
+// path itself always starts with 'api/' or 'health' and must stay intact.
+if (($segments[0] ?? '') === 'index.php') {
+    array_shift($segments);
 }
 
 // Routing

@@ -1,0 +1,11 @@
+{
+  "name": "chapkhane-php-wasm-runner",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Development runner that serves php-backend via PHP compiled to WebAssembly (@php-wasm/node) with a SQLite database — no local PHP/MySQL installation required.",
+  "dependencies": {
+    "@php-wasm/node": "3.1.48",
+    "@php-wasm/universal": "3.1.48"
+  }
+}

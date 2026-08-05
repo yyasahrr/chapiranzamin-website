@@ -135,7 +135,7 @@ export function MessageThread({
                 }`}
               >
                 <div className={`mb-1 text-[10px] font-bold ${mine ? "text-white/70" : "text-ink-700/60"}`}>
-                  {m.senderRole !== "customer" ? "کارشناس چاپ ایران‌زمین" : m.senderName} •{" "}
+                  {m.senderRole !== "customer" ? "کارشناس چاپخانه" : m.senderName} •{" "}
                   {formatDateTime(m.createdAt)}
                 </div>
                 {m.message}

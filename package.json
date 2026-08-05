@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "backend": "node php-backend/wasm-runner/serve.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

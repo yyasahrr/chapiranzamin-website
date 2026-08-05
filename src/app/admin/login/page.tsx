@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
       <div className="hidden border-l border-white/10 bg-[linear-gradient(145deg,#111827,#172554)] p-14 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="flex items-center gap-3">
           <span className="grid h-12 w-12 place-items-center border-2 border-cyan-400 text-xl font-black">چ</span>
-          <div><b>چاپ ایران‌زمین</b><span className="block text-xs text-slate-400">سامانه مدیریت عملیات چاپ</span></div>
+          <div><b>چاپخانه</b><span className="block text-xs text-slate-400">سامانه مدیریت عملیات چاپ</span></div>
         </div>
         <div>
           <p className="text-xs font-bold tracking-widest text-cyan-400">SECURE WORKSPACE</p>

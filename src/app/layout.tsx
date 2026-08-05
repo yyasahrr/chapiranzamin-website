@@ -5,9 +5,9 @@ import { getSiteUrl, isIndexingEnabled } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: "چاپ ایران‌زمین | چاپ، تبلیغات محیطی و پروژه‌های سازمانی",
+  title: "چاپخانه | چاپ، تبلیغات محیطی و پروژه‌های سازمانی",
   description:
-    "چاپ ایران‌زمین، همراه سازمان‌ها و کسب‌وکارها در طراحی، چاپ و اجرای تبلیغات محیطی، بنرهای مناسبتی و پروژه‌های سازمانی.",
+    "چاپخانه، همراه سازمان‌ها و کسب‌وکارها در طراحی، چاپ و اجرای تبلیغات محیطی، بنرهای مناسبتی و پروژه‌های سازمانی.",
   robots: {
     index: isIndexingEnabled(),
     follow: isIndexingEnabled(),
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fa_IR",
-    siteName: "چاپ ایران‌زمین",
-    title: "چاپ ایران‌زمین",
+    siteName: "چاپخانه",
+    title: "چاپخانه",
     description: "طراحی، چاپ و اجرای تبلیغات محیطی و پروژه‌های سازمانی",
   },
   twitter: { card: "summary_large_image" },

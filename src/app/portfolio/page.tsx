@@ -17,7 +17,7 @@ export default function PortfolioPage() {
       <section className="border-b-4 border-reg bg-ink-900 py-16 text-center text-paper">
         <h1 className="text-4xl"><span className="bg-goldc px-3 text-ink-900">نمونه‌کارها</span></h1>
         <p className="mx-auto mt-4 max-w-xl px-4 text-sm leading-7 text-paper/70">
-          گزیده‌ای از پروژه‌های سازمانی، شهری و صنعتی اجراشده توسط تیم چاپ ایران‌زمین.
+          گزیده‌ای از پروژه‌های سازمانی، شهری و صنعتی اجراشده توسط تیم چاپخانه.
         </p>
       </section>
       <section className="mx-auto max-w-6xl px-4 py-16">

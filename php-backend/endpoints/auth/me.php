@@ -2,7 +2,7 @@
 $token = $_COOKIE['ciz_session'] ?? '';
 if (!$token) respond(401, ['message' => 'ورود نکرده‌اید.']);
 
-$stmt = $pdo->prepare("SELECT users.* FROM sessions INNER JOIN users ON sessions.user_id = users.id WHERE sessions.token = ? AND sessions.expires_at > NOW()");
+$stmt = $pdo->prepare("SELECT users.* FROM sessions INNER JOIN users ON sessions.user_id = users.id WHERE sessions.token = ? AND sessions.expires_at > CURRENT_TIMESTAMP");
 $stmt->execute([$token]);
 $user = $stmt->fetch();
 

@@ -7,7 +7,7 @@ import { STATIC_BLOG_POSTS } from "@/lib/static-blog";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "مجله چاپ و تبلیغات | چاپ ایران‌زمین",
+  title: "مجله چاپ و تبلیغات | چاپخانه",
   description:
     "آموزش‌ها و راهنماهای تخصصی چاپ، تبلیغات محیطی، طراحی و اجرای کمپین.",
   alternates: { canonical: "/blog" },
@@ -20,7 +20,7 @@ export default async function BlogPage() {
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 py-14">
-        <p className="text-xs font-black text-reg">مجله ایران‌زمین</p>
+        <p className="text-xs font-black text-reg">مجله چاپخانه</p>
         <h1 className="mt-2 text-4xl">دانش چاپ، طراحی و تبلیغات</h1>
         <p className="mt-3 max-w-xl text-sm leading-7 text-ink-700">
           راهنماهای کاربردی برای انتخاب بهتر، کاهش هزینه و اجرای حرفه‌ای پروژه‌های

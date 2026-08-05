@@ -53,7 +53,7 @@ export default function SiteHeader() {
           </span>
           <span className="leading-tight">
             <span className="block text-lg font-black text-ink-900">
-              چاپ ایران‌زمین
+              چاپخانه
             </span>
             <span className="block text-[9px] font-bold tracking-widest text-ink-700">
               چاپ ▪ تبلیغات محیطی ▪ پروژه سازمانی

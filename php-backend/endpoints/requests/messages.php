@@ -2,7 +2,7 @@
 $requestId = (int)($_GET['id'] ?? 0);
 $token = $_COOKIE['ciz_session'] ?? '';
 
-$stmt = $pdo->prepare("SELECT user_id FROM sessions WHERE token = ? AND expires_at > NOW()");
+$stmt = $pdo->prepare("SELECT user_id FROM sessions WHERE token = ? AND expires_at > CURRENT_TIMESTAMP");
 $stmt->execute([$token]);
 $row = $stmt->fetch();
 $senderId = $row ? (int)$row['user_id'] : null;

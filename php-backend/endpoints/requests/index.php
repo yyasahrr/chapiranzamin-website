@@ -5,7 +5,7 @@ if ($method === 'GET') {
     $token = $_COOKIE['ciz_session'] ?? '';
     $user = null;
     if ($token) {
-        $stmt = $pdo->prepare("SELECT users.* FROM sessions INNER JOIN users ON sessions.user_id = users.id WHERE sessions.token = ? AND sessions.expires_at > NOW()");
+        $stmt = $pdo->prepare("SELECT users.* FROM sessions INNER JOIN users ON sessions.user_id = users.id WHERE sessions.token = ? AND sessions.expires_at > CURRENT_TIMESTAMP");
         $stmt->execute([$token]);
         $user = $stmt->fetch();
     }
@@ -31,7 +31,7 @@ $body = json_decode(file_get_contents('php://input'), true);
 $token = $_COOKIE['ciz_session'] ?? '';
 $userId = null;
 if ($token) {
-    $stmt = $pdo->prepare("SELECT user_id FROM sessions WHERE token = ? AND expires_at > NOW()");
+    $stmt = $pdo->prepare("SELECT user_id FROM sessions WHERE token = ? AND expires_at > CURRENT_TIMESTAMP");
     $stmt->execute([$token]);
     $row = $stmt->fetch();
     $userId = $row ? (int)$row['user_id'] : null;
@@ -39,8 +39,10 @@ if ($token) {
 
 $contactName = trim($body['contactName'] ?? '');
 $contactPhone = trim($body['contactPhone'] ?? '');
-$contactEmail = $body['contactEmail'] ? trim($body['contactEmail']) : null;
-$requestType = in_array($body['requestType'] ?? 'personal', ['personal', 'organization', 'municipal']) ? $body['requestType'] : 'personal';
+$contactEmailRaw = $body['contactEmail'] ?? null;
+$contactEmail = $contactEmailRaw ? trim((string) $contactEmailRaw) : null;
+$requestTypeRaw = $body['requestType'] ?? 'personal';
+$requestType = in_array($requestTypeRaw, ['personal', 'organization', 'municipal']) ? $requestTypeRaw : 'personal';
 
 if (strlen($contactName) < 2) respond(422, ['message' => 'نام تماس الزامی است.']);
 if (!preg_match('/^09\d{9}$/', $contactPhone)) respond(422, ['message' => 'شماره موبایل معتبر وارد کنید.']);

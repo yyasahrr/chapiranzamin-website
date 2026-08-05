@@ -113,7 +113,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
               چ
             </span>
             <span>
-              <span className="block text-sm font-black">چاپ ایران‌زمین</span>
+              <span className="block text-sm font-black">چاپخانه</span>
               <span className="block text-[10px] text-slate-400">Control center</span>
             </span>
           </Link>

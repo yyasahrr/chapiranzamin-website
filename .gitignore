@@ -11,6 +11,8 @@ next-env.d.ts
 .env.*.local
 !.env.example
 php-backend/.env
+php-backend/.data/
+php-backend/wasm-runner/node_modules/
 npm-debug.log*
 .dev-server*.log
 .task-temp/

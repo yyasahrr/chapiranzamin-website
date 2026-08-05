@@ -1,4 +1,4 @@
-# وب‌سایت چاپ ایران‌زمین
+# وب‌سایت چاپخانه
 
 سامانه فارسی و راست‌چین ثبت و مدیریت درخواست‌های چاپ و تبلیغات محیطی. رابط
 کاربری با Next.js اجرا می‌شود و تمام داده‌ها، احراز هویت و منطق کسب‌وکار از
@@ -54,27 +54,42 @@
 
 - Node.js 22.18 یا جدیدتر
 - npm
-- یک نمونه در حال اجرای PHP API و آدرس آن در `PHP_API_BASE_URL`
+- فقط برای اجرای بومی بک‌اند در production: PHP 8 و MySQL (در توسعه لوکال
+  نیازی به نصب PHP/MySQL نیست؛ بخش بعد را ببینید)
 
 ## اجرای لوکال
 
-در PowerShell:
+در دو ترمینال:
 
 ```powershell
 npm install
 Copy-Item .env.example .env.local
-# آدرس PHP API را در PHP_API_BASE_URL تنظیم کنید.
+# برای حالت آماده‌سازی‌شده، .env.local باید شامل PHP_API_BASE_URL=http://localhost:8080 باشد.
+
+# ترمینال ۱ — بک‌اند PHP (بدون نیاز به نصب PHP/MySQL):
+npm run backend
+
+# ترمینال ۲ — رابط کاربری:
 npm run dev
 ```
 
-سپس `http://localhost:3000` را باز کنید. برای بررسی دسترسی PHP API نیز
-`http://localhost:3000/api/health` را بررسی کنید. ساخت جداول، حساب مدیر و تمام
-تنظیمات دیتابیس فقط در محیط بک‌اند PHP انجام می‌شوند.
+`npm run backend` همان API موجود در `php-backend` را با PHP کامپایل‌شده به
+WebAssembly (`@php-wasm/node`) و دیتابیس SQLite اجرا می‌کند؛ در اولین اجرا
+وابستگی‌های runner نصب، جداول از `php-backend/migrations/sqlite/schema.sql`
+ساخته و مدیر پیش‌فرض توسعه (`09120000000` / `admin123456`) از
+`php-backend/.env` بذر می‌شود. فایل دیتابیس در `php-backend/.data/` نگه‌داری
+می‌شود (در Git ثبت نمی‌شود). کد PHP همان کدی است که در production روی PHP
+بومی و MySQL اجرا می‌شود.
+
+سپس `http://localhost:3000` را باز کنید. اتصال Next.js به بک‌اند را با
+`http://localhost:3000/api/health` بررسی کنید؛ پاسخ سالم یعنی
+`{"ok":true,"backend":"..."}`.
 
 ## فرمان‌های کاربردی
 
 ```powershell
-npm run dev        # سرور توسعه
+npm run dev        # سرور توسعه Next.js
+npm run backend    # بک‌اند توسعه PHP (WASM + SQLite) روی پورت 8080
 npm run build      # ساخت نسخه production
 npm start          # اجرای build تولیدشده
 npm run lint       # بررسی ESLint
@@ -99,8 +114,10 @@ npm run check      # اجرای lint، typecheck، test و build
 ## بک‌اند PHP
 
 این پوشه API اصلی پروژه با PHP را ارائه می‌کند و مالک انحصاری دیتابیس است.
-دستورهای نصب و اجرای آن در [`php-backend/README.md`](php-backend/README.md)
-آمده است. Next.js فقط با `fetch` و از طریق `PHP_API_BASE_URL` به آن متصل می‌شود.
+دستورهای نصب و اجرای آن — هم حالت توسعه WebAssembly/SQLite و هم حالت
+production با PHP بومی و MySQL — در
+[`php-backend/README.md`](php-backend/README.md) آمده است. Next.js فقط با
+`fetch` و از طریق `PHP_API_BASE_URL` به آن متصل می‌شود.
 
 ## وضعیت Production
 

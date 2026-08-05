@@ -66,7 +66,7 @@ export default async function HomePage() {
               </span>
             </h1>
             <p className="mt-7 max-w-md border-r-4 border-cyanink pr-4 text-sm leading-8 text-ink-700">
-              چاپ ایران‌زمین، همراه سازمان‌ها و کسب‌وکارها در طراحی، چاپ و اجرای
+              چاپخانه، همراه سازمان‌ها و کسب‌وکارها در طراحی، چاپ و اجرای
               تبلیغات محیطی، بنرهای مناسبتی و پروژه‌های سازمانی؛ از ایده تا نصب و
               پیگیری مجوز.
             </p>
@@ -91,7 +91,7 @@ export default async function HomePage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/hero.svg"
-                alt="بیلبورد شهری چاپ ایران‌زمین"
+                alt="بیلبورد شهری چاپخانه"
                 width="1200"
                 height="720"
                 className="poster-hero h-72 w-full object-cover md:h-96"
@@ -99,7 +99,7 @@ export default async function HomePage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/brand-logo.jpg"
-                alt="لوگوی رسمی چاپ ایران‌زمین"
+                alt="لوگوی رسمی چاپخانه"
                 width="600"
                 height="600"
                 className="brand-hero hidden h-72 w-full object-cover md:h-96"

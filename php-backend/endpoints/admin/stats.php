@@ -1,6 +1,6 @@
 <?php
 $token = $_COOKIE['ciz_session'] ?? '';
-$stmt = $pdo->prepare("SELECT users.* FROM sessions INNER JOIN users ON sessions.user_id = users.id WHERE sessions.token = ? AND sessions.expires_at > NOW() AND users.role = 'admin'");
+$stmt = $pdo->prepare("SELECT users.* FROM sessions INNER JOIN users ON sessions.user_id = users.id WHERE sessions.token = ? AND sessions.expires_at > CURRENT_TIMESTAMP AND users.role = 'admin'");
 $stmt->execute([$token]);
 if (!$stmt->fetch()) respond(403, ['message' => 'دسترسی غیرمجاز.']);
 

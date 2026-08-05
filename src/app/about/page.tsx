@@ -13,11 +13,11 @@ export default function AboutPage() {
     <div className="min-h-screen">
       <SiteHeader />
       <section className="border-b-4 border-reg bg-ink-900 py-16 text-center text-paper">
-        <h1 className="text-4xl"><span className="bg-goldc px-3 text-ink-900">درباره چاپ ایران‌زمین</span></h1>
+        <h1 className="text-4xl"><span className="bg-goldc px-3 text-ink-900">درباره چاپخانه</span></h1>
       </section>
       <section className="mx-auto max-w-4xl px-4 py-16">
         <p className="text-sm leading-8 text-ink-700">
-          چاپ ایران‌زمین با سال‌ها تجربه در صنعت چاپ و تبلیغات محیطی، همراه سازمان‌ها،
+          چاپخانه با سال‌ها تجربه در صنعت چاپ و تبلیغات محیطی، همراه سازمان‌ها،
           شهرداری‌ها، دانشگاه‌ها و کسب‌وکارها در اجرای پروژه‌های تبلیغاتی است. مدل کاری
           ما بر پایه مشاوره تخصصی است؛ به‌جای قیمت‌گذاری خودکار، هر درخواست توسط
           کارشناسان بررسی می‌شود و پیشنهاد فنی و مالی اختصاصی متناسب با نیاز و بودجه

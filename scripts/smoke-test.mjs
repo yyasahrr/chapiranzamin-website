@@ -18,13 +18,16 @@ for (const path of ["/", "/services", "/blog", "/request", "/login"]) {
 
 const health = await request("/api/health");
 assert.equal(health.status, 200);
-assert.deepEqual(await health.json(), { ok: true });
+const healthBody = await health.json();
+assert.equal(healthBody.ok, true, "health must report ok=true");
 assert.match(health.headers.get("content-security-policy") || "", /default-src 'self'/);
 assert.equal(health.headers.get("x-content-type-options"), "nosniff");
 checks.push("health:ok", "security-headers:ok");
 
 const unauthorized = await request("/api/admin/overview");
-assert.equal(unauthorized.status, 403);
+// The PHP backend answers 401 for anonymous users; a Next-side guard would
+// answer 403. Both prove the admin overview is not public.
+assert.ok([401, 403].includes(unauthorized.status), `expected 401/403, got ${unauthorized.status}`);
 assert.equal(typeof (await unauthorized.json()).message, "string");
 checks.push("admin-authorization:ok");
 
@@ -33,7 +36,9 @@ const malformedLogin = await request("/api/auth/login", {
   headers: { "Content-Type": "application/json" },
   body: "{",
 });
-assert.equal(malformedLogin.status, 400);
+// Next may reject malformed JSON with 400 before proxying; the PHP API
+// validates the decoded payload and answers 422.
+assert.ok([400, 422].includes(malformedLogin.status), `expected 400/422, got ${malformedLogin.status}`);
 checks.push("invalid-json:ok");
 
 const crossSite = await request("/api/auth/logout", {

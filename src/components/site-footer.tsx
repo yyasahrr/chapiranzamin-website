@@ -9,7 +9,7 @@ export default function SiteFooter() {
           className="text-center text-5xl font-black text-transparent md:text-7xl"
           style={{ WebkitTextStroke: "1px rgba(198,244,50,0.5)" }}
         >
-          چاپ ایران‌زمین
+          چاپخانه
         </p>
       </div>
 
@@ -19,7 +19,7 @@ export default function SiteFooter() {
             <span className="grid h-10 w-10 place-items-center border-2 border-goldc bg-reg text-xl font-black text-white">
               چ
             </span>
-            <span className="text-lg font-black">چاپ ایران‌زمین</span>
+            <span className="text-lg font-black">چاپخانه</span>
           </div>
           <p className="max-w-md border-r-4 border-goldc pr-4 text-sm leading-7 text-paper/70">
             همراه سازمان‌ها و کسب‌وکارها در طراحی، چاپ و اجرای تبلیغات محیطی،
@@ -64,7 +64,7 @@ export default function SiteFooter() {
         </div>
       </div>
       <div className="border-t-2 border-goldc bg-goldc py-3 text-center text-xs font-black text-ink-900">
-        © چاپ ایران‌زمین — تمامی حقوق محفوظ است ▪ چاپ ▪ تبلیغات ▪ اجرا
+        © چاپخانه — تمامی حقوق محفوظ است ▪ چاپ ▪ تبلیغات ▪ اجرا
       </div>
     </footer>
   );

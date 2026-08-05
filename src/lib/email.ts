@@ -41,7 +41,7 @@ export function getEmailConfiguration(): EmailConfiguration | null {
     user: process.env.SMTP_USER?.trim() || undefined,
     password: process.env.SMTP_PASSWORD || undefined,
     fromEmail,
-    fromName: process.env.EMAIL_FROM_NAME?.trim() || "چاپ ایران‌زمین",
+    fromName: process.env.EMAIL_FROM_NAME?.trim() || "چاپخانه",
   };
 }
 
@@ -101,13 +101,13 @@ export function renderCampaignHtml(subject: string, body: string): string {
 <html lang="fa" dir="rtl">
   <body style="margin:0;background:#f7f8fa;font-family:Tahoma,Arial,sans-serif;color:#0f172a">
     <div style="max-width:640px;margin:0 auto;padding:32px 16px">
-      <div style="background:#0f172a;color:#fff;padding:18px 24px;font-weight:700">چاپ ایران‌زمین</div>
+      <div style="background:#0f172a;color:#fff;padding:18px 24px;font-weight:700">چاپخانه</div>
       <div style="background:#fff;border:1px solid #e2e8f0;padding:28px 24px">
         <h1 style="font-size:20px;margin:0 0 18px">${safeSubject}</h1>
         <div style="font-size:14px;line-height:2">${safeBody}</div>
       </div>
       <p style="color:#64748b;font-size:11px;line-height:1.8;text-align:center">
-        این پیام از سامانه چاپ ایران‌زمین ارسال شده است.<br />
+        این پیام از سامانه چاپخانه ارسال شده است.<br />
         مدیریت دریافت ایمیل از <a href="${preferencesUrl}">تنظیمات حساب کاربری</a>
       </p>
     </div>
@@ -160,7 +160,7 @@ export async function sendVerificationEmail({
     .sendMail({
       from: { name: configuration.fromName, address: configuration.fromEmail },
       to: email,
-      subject: "کد تأیید ایمیل چاپ ایران‌زمین",
+      subject: "کد تأیید ایمیل چاپخانه",
       text: `کد تأیید شما: ${code}`,
       html: renderCampaignHtml("تأیید ایمیل", `کد تأیید شما: ${code}`),
     })

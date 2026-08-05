@@ -261,7 +261,7 @@ export default function DashboardPage() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2.5">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-950 text-sm font-black text-white">چ</span>
-            <div><b className="block text-sm">چاپ ایران‌زمین</b><span className="block text-[9px] text-slate-400">Customer portal</span></div>
+            <div><b className="block text-sm">چاپخانه</b><span className="block text-[9px] text-slate-400">Customer portal</span></div>
           </Link>
           <nav className="hidden items-center gap-1 md:flex">
             {[["داشبورد", "/dashboard"], ["سفارش جدید", "/request"], ["پیگیری", "/track"], ["پشتیبانی", latest ? `/dashboard/requests/${latest.id}` : "/contact"]].map(([label, href], index) => (
@@ -354,7 +354,7 @@ export default function DashboardPage() {
                 disabled={!profileEmail.trim()}
                 className="mt-1"
               />
-              مایل هستم اطلاعیه‌ها و پیشنهادهای چاپ ایران‌زمین را با ایمیل دریافت کنم.
+              مایل هستم اطلاعیه‌ها و پیشنهادهای چاپخانه را با ایمیل دریافت کنم.
             </label>
             {profileError && (
               <p className="mt-3 rounded bg-red-50 p-2 text-xs text-red-700">
