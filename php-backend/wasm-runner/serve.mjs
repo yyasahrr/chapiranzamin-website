@@ -22,7 +22,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:http';
 
 const runnerDir = dirname(fileURLToPath(import.meta.url));
@@ -51,16 +51,36 @@ async function ensureDeps() {
   let deps = await importRunnerDeps();
   if (deps) return deps;
   if (process.env.CHAPKHANE_RUNNER_BOOTSTRAPPED === '1') {
-    throw new Error('Runner dependencies are unavailable even after npm install.');
+    throw new Error(
+      'Runner dependencies are unavailable even after npm install. ' +
+        'Try manually: cd php-backend/wasm-runner && npm install'
+    );
   }
   log('first run: installing runner dependencies (PHP runtime as WebAssembly)…');
-  const install = spawnSync('npm', ['install', '--no-audit', '--no-fund', '--loglevel=error'], {
-    cwd: runnerDir,
-    stdio: 'inherit',
-    env: { ...process.env, npm_config_loglevel: 'error' },
-  });
+  // On Windows npm is an npm.cmd shim; bare `npm` is not executable without a
+  // shell, which used to fail with "exit null" (ENOENT/EINVAL).
+  const isWindows = process.platform === 'win32';
+  const install = spawnSync(
+    isWindows ? 'npm.cmd' : 'npm',
+    ['install', '--no-audit', '--no-fund', '--loglevel=error'],
+    {
+      cwd: runnerDir,
+      stdio: 'inherit',
+      shell: isWindows,
+      env: { ...process.env, npm_config_loglevel: 'error' },
+    }
+  );
+  if (install.error) {
+    throw new Error(
+      `npm install for wasm-runner could not start: ${install.error.message}. ` +
+        'Install manually: cd php-backend/wasm-runner && npm install'
+    );
+  }
   if (install.status !== 0) {
-    throw new Error(`npm install for wasm-runner failed (exit ${install.status}).`);
+    throw new Error(
+      `npm install for wasm-runner failed (exit ${install.status ?? install.signal}). ` +
+        'Try manually: cd php-backend/wasm-runner && npm install'
+    );
   }
   // Re-exec with a fresh module cache so the newly installed packages resolve.
   const child = spawn(process.execPath, [fileURLToPath(import.meta.url), ...process.argv.slice(2)], {
