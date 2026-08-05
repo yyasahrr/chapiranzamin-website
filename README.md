@@ -63,8 +63,9 @@
 
 ```powershell
 npm install
-Copy-Item .env.example .env.local
-# برای حالت آماده‌سازی‌شده، .env.local باید شامل PHP_API_BASE_URL=http://localhost:8080 باشد.
+# فایل .env.local در توسعه اختیاری است؛ بدون آن هم Next.js به‌طور خودکار به
+# http://localhost:8080 متصل می‌شود. برای تغییر آدرس بک‌اند، مقدار
+# PHP_API_BASE_URL را در .env.local تنظیم کنید.
 
 # ترمینال ۱ — بک‌اند PHP (بدون نیاز به نصب PHP/MySQL):
 npm run backend

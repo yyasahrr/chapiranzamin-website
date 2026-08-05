@@ -1,5 +1,10 @@
 import type { NextRequest } from "next/server";
 
+// `npm run backend` serves the PHP API here in local development, so the
+// frontend works with zero env setup. Production must still set
+// PHP_API_BASE_URL explicitly.
+const DEV_PHP_API_FALLBACK_URL = "http://localhost:8080";
+
 function trimTrailingSlash(value: string) {
   return value.endsWith("/") ? value.slice(0, -1) : value;
 }
@@ -10,7 +15,9 @@ export function getPhpBackendBaseUrl() {
     process.env.BACKEND_API_URL?.trim() ||
     process.env.NEXT_PUBLIC_BACKEND_API_URL?.trim() ||
     "";
-  return configured ? trimTrailingSlash(configured) : "";
+  if (configured) return trimTrailingSlash(configured);
+  if (process.env.NODE_ENV !== "production") return DEV_PHP_API_FALLBACK_URL;
+  return "";
 }
 
 export function phpBackendConfigured() {
@@ -26,6 +33,17 @@ export function buildPhpBackendUrl(path: string) {
 
 export function backendUnavailableResponse(message = "اتصال بک‌اند PHP تنظیم نشده است.") {
   return Response.json({ message }, { status: 503 });
+}
+
+export function backendUnreachableResponse() {
+  const hint =
+    process.env.NODE_ENV !== "production"
+      ? " «npm run backend» را اجرا کرده‌اید؟"
+      : "";
+  return Response.json(
+    { message: `پاسخی از بک‌اند دریافت نشد.${hint}` },
+    { status: 503 }
+  );
 }
 
 export async function proxyPhpRequest(
@@ -52,13 +70,18 @@ export async function proxyPhpRequest(
   const body =
     method === "GET" || method === "HEAD" ? undefined : await request.text();
 
-  const response = await fetch(targetUrl, {
-    method,
-    headers,
-    body,
-    cache: "no-store",
-    redirect: "manual",
-  });
+  let response: Response;
+  try {
+    response = await fetch(targetUrl, {
+      method,
+      headers,
+      body,
+      cache: "no-store",
+      redirect: "manual",
+    });
+  } catch {
+    return backendUnreachableResponse();
+  }
 
   const responseHeaders = new Headers();
   const forwarded = ["content-type", "set-cookie", "location", "cache-control"];
@@ -80,17 +103,20 @@ export async function fetchPhpJson<T>(
   const target = buildPhpBackendUrl(path);
   if (!target) return null;
 
-  const response = await fetch(target, {
-    ...init,
-    cache: "no-store",
-    headers: {
-      Accept: "application/json",
-      ...(init?.headers ?? {}),
-    },
-  });
-
-  if (!response.ok) return null;
-  return (await response.json()) as T;
+  try {
+    const response = await fetch(target, {
+      ...init,
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        ...(init?.headers ?? {}),
+      },
+    });
+    if (!response.ok) return null;
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchPhpJsonFromRequest<T>(
@@ -106,14 +132,17 @@ export async function fetchPhpJsonFromRequest<T>(
   if (cookie) headers.set("cookie", cookie);
   headers.set("accept", "application/json");
 
-  const response = await fetch(target, {
-    ...init,
-    cache: "no-store",
-    headers,
-  });
-
-  if (!response.ok) return null;
-  return (await response.json()) as T;
+  try {
+    const response = await fetch(target, {
+      ...init,
+      cache: "no-store",
+      headers,
+    });
+    if (!response.ok) return null;
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  }
 }
 
 export function notImplementedPhpRoute(message: string) {
