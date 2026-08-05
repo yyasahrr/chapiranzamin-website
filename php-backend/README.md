@@ -61,7 +61,10 @@ npm run backend
 2. اگر `php-backend/.env` وجود نداشته باشد، آن را با `DB_DRIVER=sqlite` و
    حساب مدیر توسعه (`09120000000` / `admin123456`) می‌سازد.
 3. اسکیمای SQLite را از `migrations/sqlite/schema.sql` اعمال و اولین مدیر را
-   با `scripts/bootstrap.php` بذر می‌کند.
+   با `scripts/bootstrap.php` بذر می‌کند (موبایل `09120000000`، رمز
+   `admin123456`). برای تعریف رمز جدید یا ساخت مدیر دیگر:
+   `npm run backend:admin -- <موبایل> <رمز>` (اسکریپت
+   `scripts/set-admin-password.php`).
 4. API را روی `http://localhost:8080` سرو می‌کند (پورت با `PHP_BACKEND_PORT`
    قابل تغییر است). فایل SQLite در `php-backend/.data/` می‌ماند.
 

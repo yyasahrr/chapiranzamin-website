@@ -125,7 +125,64 @@ async function runBootstrap(php) {
   if (stderr.trim()) console.error('[php-wasm-runner] bootstrap stderr:', stderr.trim());
 }
 
+/**
+ * `npm run backend:admin -- <phone> <password> [name]`
+ * Creates or resets the admin account without starting the server.
+ */
+async function runSetAdminTool(args) {
+  const [phone, password, name] = args;
+  if (!phone || !password) {
+    console.error(
+      'کاربرد: npm run backend:admin -- <موبایل> <رمز جدید> [نام]\n' +
+        'مثال:   npm run backend:admin -- 09120000000 admin123456'
+    );
+    process.exit(1);
+  }
+
+  const { universal, nodeModule } = await ensureDeps();
+  if (!universal || !nodeModule) return;
+  const { PHP } = universal;
+  const { loadNodeRuntime, createNodeFsMountHandler } = nodeModule;
+
+  mkdirSync(join(backendDir, '.data'), { recursive: true });
+  ensureBackendEnv();
+
+  const php = new PHP(
+    await loadNodeRuntime('8.3', {
+      emscriptenOptions: {
+        processId: 1,
+        ENV: {
+          ADMIN_TOOL_PHONE: phone,
+          ADMIN_TOOL_PASSWORD: password,
+          ADMIN_TOOL_NAME: name ?? '',
+        },
+      },
+    })
+  );
+  await php.mount(PHP_VFS_ROOT, createNodeFsMountHandler(backendDir));
+
+  const result = await php.runStream({
+    scriptPath: `${PHP_VFS_ROOT}/scripts/set-admin-password.php`,
+  });
+  const stdout = (await result.stdoutText).trim();
+  const stderr = (await result.stderrText).trim();
+  if (stdout) console.log(stdout);
+  if (stderr) console.error(stderr);
+
+  const ok = /"ok"\s*:\s*true/.test(stdout);
+  if (ok) {
+    console.log(`[php-wasm-runner] مدیر آماده است — ورود با موبایل ${phone} و رمز تعیین‌شده.`);
+  }
+  process.exit(ok ? 0 : 1);
+}
+
 async function main() {
+  const setAdminFlag = process.argv.indexOf('--set-admin');
+  if (setAdminFlag !== -1) {
+    await runSetAdminTool(process.argv.slice(setAdminFlag + 1));
+    return;
+  }
+
   const { universal, nodeModule } = await ensureDeps();
   if (!universal || !nodeModule) return; // re-exec in progress
   const { PHP, PHPRequestHandler, setPhpIniEntries } = universal;

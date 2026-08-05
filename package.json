@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "backend": "node php-backend/wasm-runner/serve.mjs",
+    "backend:admin": "node php-backend/wasm-runner/serve.mjs --set-admin",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
